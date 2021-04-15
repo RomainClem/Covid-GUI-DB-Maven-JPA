@@ -15,8 +15,6 @@ public class Main {
         changeFName(4, "Mark");
 
         deleteName(4);
-
-
         ENTITY_MANAGER_FACTORY.close();
     }
 
