@@ -1,53 +1,20 @@
+package model.java;
+
 import javax.persistence.*;
 import java.util.List;
 
-public class Main {
-    private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("FinalProjectMavenJPA");
 
-    public static void main(String[] args) {
-        addName(1, "Jean", "Aldfred", "Touret");
-        addName(2, "toto", "lol", "alberto");
-        addName(3, "neaj", "kek", "rpoger");
-        addName(4, "Rom", "wouf", "chien");
+public class NameDao implements Dao<Name> {
+    private final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("FinalProjectMavenJPA");
 
-        getName(1);
-        getNames();
-        changeFName(4, "Mark");
-
-        deleteName(4);
-        ENTITY_MANAGER_FACTORY.close();
-    }
-
-    public static void addName(int id, String fName, String lName, String mName){
-        EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
-        EntityTransaction et = null;
-        try {
-            et = em.getTransaction();
-            et.begin();
-            Name name = new Name();
-            name.setId(id);
-            name.setFirstName(fName);
-            name.setMiddleName(mName);
-            name.setLastName(lName);
-            em.persist(name);
-            et.commit();
-        }
-        catch(Exception ex){
-            if(et != null) et.rollback();
-            ex.printStackTrace();
-        }
-        finally {
-            em.close();
-        }
-    }
-
-    public static void getName(int id) {
+    @Override
+    public Name get(int id) {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         String query = "SELECT n FROM Name n WHERE n.id = :ID";
 
         TypedQuery<Name> tq = em.createQuery(query, Name.class);
         tq.setParameter("ID", id);
-        Name name;
+        Name name = null;
         try {
             name = tq.getSingleResult();
             System.out.println(name.getFirstName() + " " + name.getLastName());
@@ -57,14 +24,15 @@ public class Main {
         finally {
             em.close();
         }
-
+        return name;
     }
 
-    public static void getNames(){
+    @Override
+    public List<Name> getAll() {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         String strQuery = "SELECT n FROM Name n WHERE n.id IS NOT NULL";
         TypedQuery<Name> tq =  em.createQuery(strQuery, Name.class);
-        List<Name> names;
+        List<Name> names = null;
         try {
             names = tq.getResultList();
             names.forEach(name -> System.out.println(name.getFirstName() + " " + name.getLastName()));
@@ -74,18 +42,16 @@ public class Main {
         finally {
             em.close();
         }
+        return names;
     }
 
-    public static void changeFName(int id, String fName){
+    @Override
+    public void save(Name name) {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         EntityTransaction et = null;
-        Name name = null;
         try {
             et = em.getTransaction();
             et.begin();
-            name = em.find(Name.class, id);
-            name.setFirstName(fName);
-
             em.persist(name);
             et.commit();
         }
@@ -98,15 +64,34 @@ public class Main {
         }
     }
 
-    public static void deleteName(int id){
+    @Override
+    public void update(Name name) {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         EntityTransaction et = null;
-        Name name = null;
-
         try {
             et = em.getTransaction();
             et.begin();
-            name = em.find(Name.class, id);
+            name = em.find(Name.class, name.getId());
+            em.persist(name);
+            et.commit();
+        }
+        catch(Exception ex){
+            if(et != null) et.rollback();
+            ex.printStackTrace();
+        }
+        finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public void delete(Name name) {
+        EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
+        EntityTransaction et = null;
+        try {
+            et = em.getTransaction();
+            et.begin();
+            name = em.find(Name.class, name.getId());
             em.remove(name);
             em.persist(name);
             et.commit();
@@ -119,4 +104,5 @@ public class Main {
             em.close();
         }
     }
+
 }

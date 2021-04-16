@@ -1,3 +1,5 @@
+package model.java;
+
 import java.io.Serializable;
 import javax.persistence.*;
 
