@@ -65,7 +65,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.6</version>
                 <configuration>
-                        <mainClass>view.java.Main</mainClass>
+                        <mainClass>view.java.covidGui</mainClass>
                 </configuration>
             </plugin>
         </plugins>

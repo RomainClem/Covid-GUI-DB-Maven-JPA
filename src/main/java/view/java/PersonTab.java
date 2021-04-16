@@ -1,72 +1,109 @@
 package view.java;
 
-
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
-import model.java.Contact;
 import controller.java.Controller;
+import model.java.Person;
 
 public class PersonTab extends Tab {
-    private TableView<Contact> tbContact;
 
-    //Initializing an Optional result ButtonType for the Exit Alert
-    public PersonTab(Stage stage){
+    public PersonTab(){
 
         //region Attributes initialisation
         //Labels
         Label lbTitle = new Label("Add Contact");
-        Label lbFname = new Label("First name");
-        Label lbMname = new Label("Middle name");
-        Label lbLname = new Label("Last name");
+        Label lbFName = new Label("First name");
+        Label lbMName = new Label("Middle name");
+        Label lbLName = new Label("Last name");
         Label lbId = new Label("Id");
         Label lbPnum = new Label("Phone number");
         Label lbEmail = new Label("Email");
 
         //TextFields
-        TextField tfFname = new TextField();
-        TextField tfMname = new TextField();
-        TextField tfLname = new TextField();
-        TextField tfPnum = new TextField();
+        TextField tfFName = new TextField();
+        TextField tfMName = new TextField();
+        TextField tfLName = new TextField();
         TextField tfID = new TextField();
+        TextField tfPnum = new TextField();
         TextField tfEmail = new TextField();
 
         //Buttons
         Button btAdd = new Button("Add");
 
-        //GridPane, Controller
-        //region Attributes
+        //GridPane, Controller and misc.
         Controller ctrl = new Controller();
         GridPane root = new GridPane();
-
+        TableView<Person> tbPerson = new TableView<>();
         //endregion
+
+        //region TableView
+        tbPerson.setPlaceholder(new Label("No data in database."));
+
+        TableColumn<Person, Integer> colId = new TableColumn<>("ID");
+        TableColumn<Person, String> colFName = new TableColumn<>("First Name");
+        TableColumn<Person, String> colLName = new TableColumn<>("Last Name");
+
+        colId.setMaxWidth(30);
+        colFName.setMaxWidth(100);
+        colLName.setMaxWidth(100);
+
+        colId.setCellValueFactory(new PropertyValueFactory<>("Id"));
+        colFName.setCellValueFactory(new PropertyValueFactory<>("fName"));
+        colLName.setCellValueFactory(new PropertyValueFactory<>("lName"));
+
+        // Row handling event
+        tbPerson.setRowFactory(tv -> {
+            TableRow<Person> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 1 && (!row.isEmpty())) {
+                    Person rowData = row.getItem();
+                    System.out.println("Double click on: " + rowData.getName());
+                }
+            });
+            return row;
+        });
+
+        tbPerson.getColumns().addAll(colId, colFName, colLName);
+        //endregion
+
+
 
         //region GridPane settings
         root.setPadding(new Insets(10));
         root.setHgap(25);
-        root.setVgap(15);
+        root.setVgap(1);
         //endregion
 
         //region GridPane layout
         //Setting up the cells where each elements are meant to be
         root.setAlignment(Pos.CENTER);
 
-        root.add(lbTitle, 0, 0, 2, 1);
-        GridPane.setHalignment(lbTitle, HPos.CENTER);
+        root.add(tbPerson, 0, 0, 1, 13);
+        GridPane.setHalignment(tbPerson, HPos.CENTER);
 
-        root.add(lbFname, 0, 1);
-        root.add(tfFname, 0, 2);
+        root.add(lbFName, 1, 0);
+        root.add(tfFName, 1, 1);
 
-        root.add(lbMname, 0, 3);
-        root.add(tfMname, 0, 4);
+        root.add(lbMName, 1, 2);
+        root.add(tfMName, 1, 3);
 
-        root.add(lbLname, 0, 5);
-        root.add(tfLname, 0, 6);
+        root.add(lbLName, 1, 4);
+        root.add(tfLName, 1, 5);
 
+        root.add(lbId, 1, 6);
+        root.add(tfID, 1, 7);
+
+        root.add(lbPnum, 1, 8);
+        root.add(tfPnum, 1, 9);
+
+        root.add(lbEmail, 1, 10);
+        root.add(tfEmail, 1, 11);
         //endregion
+
         setContent(root);
     }
 }
