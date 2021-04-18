@@ -7,13 +7,9 @@ import javafx.scene.control.MenuBar;
 public class MenuCovidGui extends MenuBar {
 
     public MenuCovidGui(){
-        Menu menu1 = new Menu("Menu 1");
-        getMenus().add(menu1);
+        Menu mPerson = new Menu("Person");
+        Menu mContact = new Menu("Contact");
+        getMenus().addAll(mPerson, mContact);
     }
-
-
-
-
-
 
 }

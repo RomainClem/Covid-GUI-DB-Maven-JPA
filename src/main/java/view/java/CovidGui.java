@@ -7,7 +7,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class covidGui extends Application {
+public class CovidGui extends Application {
 
     @Override
     public void start(Stage stage){
