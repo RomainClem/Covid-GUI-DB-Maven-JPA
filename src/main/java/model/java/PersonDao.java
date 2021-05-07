@@ -4,55 +4,64 @@ import javax.persistence.*;
 import java.util.List;
 
 
-public class NameDao implements Dao<Name> {
+public class PersonDao implements Dao<Person> {
     private final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("FinalProjectMavenJPA");
 
     @Override
-    public Name get(int id) {
+    public Person get(int id) {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
-        String query = "SELECT n FROM Name n WHERE n.id = :ID";
+        String query = "SELECT p FROM Person p WHERE p.id = :ID";
 
-        TypedQuery<Name> tq = em.createQuery(query, Name.class);
+        TypedQuery<Person> tq = em.createQuery(query, Person.class);
         tq.setParameter("ID", id);
-        Name name = null;
+        Person person = null;
         try {
-            name = tq.getSingleResult();
-            System.out.println(name.getFirstName() + " " + name.getLastName());
+            person = tq.getSingleResult();
+            NameDao nameDao = new NameDao();
+            Name name = nameDao.get(person.getId());
+            person.setName(name);
+            System.out.println(person);
         } catch (NoResultException ex) {
             ex.printStackTrace();
         }
         finally {
             em.close();
         }
-        return name;
+        return person;
     }
 
     @Override
-    public List<Name> getAll() {
+    public List<Person> getAll() {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
-        String strQuery = "SELECT n FROM Name n WHERE n.id IS NOT NULL";
-        TypedQuery<Name> tq =  em.createQuery(strQuery, Name.class);
-        List<Name> names = null;
+        String strQuery = "SELECT p FROM Person p WHERE p.id IS NOT NULL";
+        TypedQuery<Person> tq =  em.createQuery(strQuery, Person.class);
+        List<Person> persons = null;
+
         try {
-            names = tq.getResultList();
-            names.forEach(name -> System.out.println(name.getFirstName() + " " + name.getLastName()));
+            persons = tq.getResultList();
+            persons.forEach(person -> {
+                NameDao nameDao = new NameDao();
+                Name name = nameDao.get(person.getId());
+                person.setName(name);
+                System.out.println(person);
+            });
         } catch (NoResultException ex) {
             ex.printStackTrace();
         }
         finally {
             em.close();
         }
-        return names;
+        return persons;
     }
 
     @Override
-    public void save(Name name) {
+    public void save(Person person) {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         EntityTransaction et = null;
         try {
             et = em.getTransaction();
             et.begin();
-            em.persist(name);
+            em.persist(person);
             et.commit();
         }
         catch(Exception ex){
@@ -65,14 +74,14 @@ public class NameDao implements Dao<Name> {
     }
 
     @Override
-    public void update(Name name) {
+    public void update(Person person) {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         EntityTransaction et = null;
         try {
             et = em.getTransaction();
             et.begin();
-            name = em.find(Name.class, name.getId());
-            em.persist(name);
+            person = em.find(Person.class, person.getId());
+            em.persist(person);
             et.commit();
         }
         catch(Exception ex){
@@ -85,15 +94,15 @@ public class NameDao implements Dao<Name> {
     }
 
     @Override
-    public void delete(Name name) {
+    public void delete(Person person) {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         EntityTransaction et = null;
         try {
             et = em.getTransaction();
             et.begin();
-            name = em.find(Name.class, name.getId());
-            em.remove(name);
-            em.persist(name);
+            person = em.find(Person.class, person.getId());
+            em.remove(person);
+            em.persist(person);
             et.commit();
         }
         catch(Exception ex){

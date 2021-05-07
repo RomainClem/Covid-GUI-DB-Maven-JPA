@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import controller.java.Controller;
+import javafx.scene.layout.HBox;
 import model.java.Person;
 
 public class PersonTab extends Tab {
@@ -33,11 +34,14 @@ public class PersonTab extends Tab {
 
         //Buttons
         Button btAdd = new Button("Add");
+        Button btDelete = new Button("Delete");
+        Button btUpdate = new Button("Edit");
 
         //GridPane, Controller and misc.
         Controller ctrl = new Controller();
         GridPane root = new GridPane();
         TableView<Person> tbPerson = new TableView<>();
+        HBox hbRowButtons = new HBox();
         //endregion
 
         //region TableView
@@ -71,6 +75,14 @@ public class PersonTab extends Tab {
         //endregion
 
 
+        //region Buttons
+        hbRowButtons.getChildren().addAll(btAdd,btUpdate, btDelete);
+        hbRowButtons.setSpacing(10);
+
+        btAdd.setOnAction(e -> {
+
+        });
+        //endregion
 
         //region GridPane settings
         root.setPadding(new Insets(10));
@@ -82,7 +94,7 @@ public class PersonTab extends Tab {
         //Setting up the cells where each elements are meant to be
         root.setAlignment(Pos.CENTER);
 
-        root.add(tbPerson, 0, 0, 1, 13);
+        root.add(tbPerson, 0, 0, 1, 14);
         GridPane.setHalignment(tbPerson, HPos.CENTER);
 
         root.add(lbFName, 1, 0);
@@ -102,6 +114,8 @@ public class PersonTab extends Tab {
 
         root.add(lbEmail, 1, 10);
         root.add(tfEmail, 1, 11);
+
+        root.add(hbRowButtons, 1, 13, 2, 1);
         //endregion
 
         setContent(root);

@@ -4,7 +4,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class CovidGui extends Application {
@@ -16,8 +16,7 @@ public class CovidGui extends Application {
 
         //region MenuBar
         MenuBar menuGui = new MenuCovidGui();
-//        MenuBar menuBar = new MenuBar();
-        VBox vBox = new VBox(menuGui);
+//        VBox vBox = new VBox(menuGui);
         root.setTop(menuGui);
         //endregion
 
@@ -28,12 +27,13 @@ public class CovidGui extends Application {
         tP.getTabs().addAll(tabPerson);
         root.setCenter(tP);
         //endregion
-
-
+        
         //region Stage settings
         stage.setTitle("Covid application");
         //Giving it a nice color
         root.setStyle("-fx-base:SALMON");
+
+//        stage.initModality(Modality.WINDOW_MODAL);
 
         stage.setScene(new Scene(root));
         stage.show();

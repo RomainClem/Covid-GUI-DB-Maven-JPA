@@ -21,6 +21,17 @@ public class Name implements Serializable{
     @Column(name = "lastName", nullable = false)
     private String lastName;
 
+    public Name(int id, String firstName, String middleName, String lastName) {
+        this.id = id;
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.lastName = lastName;
+    }
+
+    public Name() {
+
+    }
+
     //region Getters/Setters
     public int getId() {
         return id;
@@ -52,6 +63,16 @@ public class Name implements Serializable{
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    @Override
+    public String toString() {
+        return "Name{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", middleName='" + middleName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
     }
 
     //endregion
