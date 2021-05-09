@@ -10,19 +10,15 @@ public class PersonDao implements Dao<Person> {
     @Override
     public Person get(int id) {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
-        String query = "SELECT p FROM Person p WHERE p.id = :ID";
+        String query = "SELECT p FROM Person p WHERE p.id = :person_id";
 
         TypedQuery<Person> tq = em.createQuery(query, Person.class);
-        tq.setParameter("ID", id);
+        tq.setParameter("person_id", id);
         Person person = null;
         try {
             person = tq.getSingleResult();
-            NameDao nameDao = new NameDao();
-            Name name = nameDao.get(person.getId());
-            person.setName(name);
-            System.out.println(person);
         } catch (NoResultException ex) {
-            ex.printStackTrace();
+            System.out.println(ex.getMessage());
         }
         finally {
             em.close();
@@ -43,7 +39,6 @@ public class PersonDao implements Dao<Person> {
                 NameDao nameDao = new NameDao();
                 Name name = nameDao.get(person.getId());
                 person.setName(name);
-                System.out.println(person);
             });
         } catch (NoResultException ex) {
             ex.printStackTrace();
@@ -74,13 +69,15 @@ public class PersonDao implements Dao<Person> {
     }
 
     @Override
-    public void update(Person person) {
+    public void update(Person newPerson) {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         EntityTransaction et = null;
         try {
             et = em.getTransaction();
             et.begin();
-            person = em.find(Person.class, person.getId());
+            Person person = em.find(Person.class, newPerson.getId());
+            person.setEmail(newPerson.getEmail());
+            person.setPhone(newPerson.getPhone());
             em.persist(person);
             et.commit();
         }
@@ -94,15 +91,14 @@ public class PersonDao implements Dao<Person> {
     }
 
     @Override
-    public void delete(Person person) {
+    public void delete(int id) {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         EntityTransaction et = null;
         try {
             et = em.getTransaction();
             et.begin();
-            person = em.find(Person.class, person.getId());
+            Person person = em.find(Person.class, id);
             em.remove(person);
-            em.persist(person);
             et.commit();
         }
         catch(Exception ex){

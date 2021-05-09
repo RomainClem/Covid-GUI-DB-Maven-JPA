@@ -1,47 +1,68 @@
 package view.java;
 
+import javafx.collections.FXCollections;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import controller.java.Controller;
 import javafx.scene.layout.HBox;
 import model.java.Person;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 public class PersonTab extends Tab {
+    TextField tfFName,tfMName,tfLName,tfID,tfPNum,tfEmail;
+    TableView<Person> tbPerson;
+    Controller ctrl;
+    Button btUpdate;
 
     public PersonTab(){
 
         //region Attributes initialisation
         //Labels
-        Label lbTitle = new Label("Add Contact");
         Label lbFName = new Label("First name");
         Label lbMName = new Label("Middle name");
         Label lbLName = new Label("Last name");
         Label lbId = new Label("Id");
-        Label lbPnum = new Label("Phone number");
+        Label lbPNum = new Label("Phone number");
         Label lbEmail = new Label("Email");
 
         //TextFields
-        TextField tfFName = new TextField();
-        TextField tfMName = new TextField();
-        TextField tfLName = new TextField();
-        TextField tfID = new TextField();
-        TextField tfPnum = new TextField();
-        TextField tfEmail = new TextField();
+        tfFName = new TextField();
+        tfMName = new TextField();
+        tfLName = new TextField();
+        tfID = new TextField();
+        tfID.setDisable(true);
+        tfPNum = new TextField();
+        tfEmail = new TextField();
 
         //Buttons
-        Button btAdd = new Button("Add");
         Button btDelete = new Button("Delete");
-        Button btUpdate = new Button("Edit");
+        btUpdate = new Button("Edit");
+        Button btRefresh = new Button();
 
         //GridPane, Controller and misc.
-        Controller ctrl = new Controller();
+        ctrl = new Controller();
         GridPane root = new GridPane();
-        TableView<Person> tbPerson = new TableView<>();
+        tbPerson = new TableView<>();
         HBox hbRowButtons = new HBox();
+        Alert alError = new Alert(Alert.AlertType.ERROR);
+        Alert alSuccess = new Alert(Alert.AlertType.INFORMATION);
+        //endregion
+
+        //region Image + refresh button
+        ImageView imgVRefresh = new ImageView(getClass().getClassLoader().getResource("img/refresh.png").toExternalForm());
+
+        imgVRefresh.setFitHeight(25);
+        imgVRefresh.setPreserveRatio(true);
+
+        btRefresh.setPrefSize(25,25);
+        btRefresh.setGraphic(imgVRefresh);
         //endregion
 
         //region TableView
@@ -64,29 +85,78 @@ public class PersonTab extends Tab {
             TableRow<Person> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 1 && (!row.isEmpty())) {
-                    Person rowData = row.getItem();
-                    System.out.println("Double click on: " + rowData.getName());
+                    Person peronRow = row.getItem();
+                    tfFName.setText(peronRow.getFName());
+                    tfMName.setText(peronRow.getMName());
+                    tfLName.setText(peronRow.getLName());
+                    tfID.setText(Integer.toString(peronRow.getId()));
+                    tfPNum.setText(peronRow.getPhone());
+                    tfEmail.setText(peronRow.getEmail());
+                    btUpdate.setDisable(false);
                 }
             });
             return row;
         });
 
         tbPerson.getColumns().addAll(colId, colFName, colLName);
+        tbPerson.setMaxHeight(400);
+        tbPerson.setPlaceholder(new Label("Refresh or Add Person to the database."));
         //endregion
 
-
-        //region Buttons
-        hbRowButtons.getChildren().addAll(btAdd,btUpdate, btDelete);
+        //region Buttons w/event handling
+        hbRowButtons.getChildren().addAll(btUpdate, btDelete);
         hbRowButtons.setSpacing(10);
+        hbRowButtons.setAlignment(Pos.BASELINE_CENTER);
 
-        btAdd.setOnAction(e -> {
-
+        btUpdate.setDisable(true);
+        btUpdate.setOnAction(e -> {
+            List<Object> personInfo = new LinkedList<>();
+            try {
+                String fName = tfFName.getText();
+                String mName = tfMName.getText();
+                String lName = tfLName.getText();
+                int id = Integer.parseInt(tfID.getText());
+                String pNum = tfPNum.getText();
+                String email = tfEmail.getText();
+                Collections.addAll(personInfo, fName, mName, lName, id, pNum, email);
+            } catch (Exception ex) {
+                //Catching incorrect info, and displaying an Alert
+                alError.setHeaderText("Incorrect type in text field!");
+                alError.setContentText("(Make sure that ID is a positive integer)");
+                alError.show();
+            }
+            if ((int) personInfo.get(3) < 0) {
+                alError.setHeaderText("ID must be a positive integer.");
+                alError.setContentText("");
+                alError.show();
+            } else {
+                ctrl.updatePerson(personInfo);
+                alSuccess.setHeaderText("Person updated.");
+                alSuccess.show();
+                clearAndLoad();
+            }
         });
+
+        btDelete.setOnAction(e ->{
+            int id = -1;
+            try {
+                id = Integer.parseInt(tfID.getText());
+            } catch (Exception ex){
+                alError.setHeaderText("Select a person to delete first.");
+                alError.setContentText("");
+                alError.show();
+            }
+
+            if (id > 0) ctrl.deletePerson(id);
+            clearAndLoad();
+        });
+
+        btRefresh.setOnAction(e -> tbPerson.setItems(FXCollections.observableArrayList(ctrl.loadPerson())));
         //endregion
 
         //region GridPane settings
         root.setPadding(new Insets(10));
-        root.setHgap(25);
+        root.setHgap(15);
         root.setVgap(1);
         //endregion
 
@@ -94,7 +164,7 @@ public class PersonTab extends Tab {
         //Setting up the cells where each elements are meant to be
         root.setAlignment(Pos.CENTER);
 
-        root.add(tbPerson, 0, 0, 1, 14);
+        root.add(tbPerson, 0, 0, 1, 15);
         GridPane.setHalignment(tbPerson, HPos.CENTER);
 
         root.add(lbFName, 1, 0);
@@ -109,15 +179,32 @@ public class PersonTab extends Tab {
         root.add(lbId, 1, 6);
         root.add(tfID, 1, 7);
 
-        root.add(lbPnum, 1, 8);
-        root.add(tfPnum, 1, 9);
+        root.add(lbPNum, 1, 8);
+        root.add(tfPNum, 1, 9);
 
         root.add(lbEmail, 1, 10);
         root.add(tfEmail, 1, 11);
 
-        root.add(hbRowButtons, 1, 13, 2, 1);
+        root.add(hbRowButtons, 1, 13);
+        GridPane.setMargin(hbRowButtons, new Insets(20,0 ,0 ,0));
+
+        root.add(btRefresh,1, 14);
+        GridPane.setHalignment(btRefresh, HPos.CENTER);
         //endregion
 
+        setText("Person");
         setContent(root);
     }
+
+    public void clearAndLoad() {
+        tfFName.clear();
+        tfMName.clear();
+        tfLName.clear();
+        tfID.clear();
+        tfPNum.clear();
+        tfEmail.clear();
+        tbPerson.setItems(FXCollections.observableArrayList(ctrl.loadPerson()));
+        btUpdate.setDisable(true);
+    }
+
 }

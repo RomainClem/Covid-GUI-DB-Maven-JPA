@@ -7,10 +7,10 @@ import javax.persistence.*;
 @Table(name = "name")
 
 public class Name implements Serializable{
-
+    //region Attributes
     @Id
-    @Column(name = "ID", unique = true)
-    private int id;
+    @Column(name = "name_id", unique = true)
+    private Integer id;
 
     @Column(name = "firstName", nullable = false)
     private String firstName;
@@ -20,6 +20,12 @@ public class Name implements Serializable{
 
     @Column(name = "lastName", nullable = false)
     private String lastName;
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "name_id")
+    private Person person;
+    //endregion
 
     public Name(int id, String firstName, String middleName, String lastName) {
         this.id = id;
@@ -65,14 +71,15 @@ public class Name implements Serializable{
         this.lastName = lastName;
     }
 
+    public void setPerson(Person person) {
+        this.person = person;
+    }
+
     @Override
     public String toString() {
-        return "Name{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", middleName='" + middleName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                '}';
+        return  firstName + ' ' +
+                middleName + ' ' +
+                lastName;
     }
 
     //endregion

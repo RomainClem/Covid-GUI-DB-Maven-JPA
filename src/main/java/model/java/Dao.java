@@ -13,6 +13,6 @@ public interface Dao<T> {
 
     void update(T t);
 
-    void delete(T t);
+    void delete(int id);
 
 }

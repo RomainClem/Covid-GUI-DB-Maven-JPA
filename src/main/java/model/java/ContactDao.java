@@ -3,54 +3,53 @@ package model.java;
 import javax.persistence.*;
 import java.util.List;
 
-
-public class NameDao implements Dao<Name> {
+public class ContactDao implements Dao<Contact> {
     private final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("FinalProjectMavenJPA");
 
     @Override
-    public Name get(int id) {
+    public Contact get(int id) {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
-        String query = "SELECT n FROM Name n WHERE n.id = :name_id";
+        String query = "SELECT c FROM Contact c WHERE c.id = :contact_id";
 
-        TypedQuery<Name> tq = em.createQuery(query, Name.class);
-        tq.setParameter("name_id", id);
-        Name name = null;
+        TypedQuery<Contact> tq = em.createQuery(query, Contact.class);
+        tq.setParameter("contact_id", id);
+        Contact contact = null;
         try {
-            name = tq.getSingleResult();
+            contact = tq.getSingleResult();
         } catch (NoResultException ex) {
             ex.printStackTrace();
         }
         finally {
             em.close();
         }
-        return name;
+        return contact;
     }
 
     @Override
-    public List<Name> getAll() {
+    public List<Contact> getAll() {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
-        String strQuery = "SELECT n FROM Name n WHERE n.id IS NOT NULL";
-        TypedQuery<Name> tq =  em.createQuery(strQuery, Name.class);
-        List<Name> names = null;
+        String strQuery = "SELECT c FROM Contact c WHERE c.id IS NOT NULL";
+        TypedQuery<Contact> tq =  em.createQuery(strQuery, Contact.class);
+        List<Contact> contacts = null;
         try {
-            names = tq.getResultList();
+            contacts = tq.getResultList();
         } catch (NoResultException ex) {
             ex.printStackTrace();
         }
         finally {
             em.close();
         }
-        return names;
+        return contacts;
     }
 
     @Override
-    public void save(Name name) {
+    public void save(Contact contact) {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         EntityTransaction et = null;
         try {
             et = em.getTransaction();
             et.begin();
-            em.persist(name);
+            em.persist(contact);
             et.commit();
         }
         catch(Exception ex){
@@ -63,17 +62,17 @@ public class NameDao implements Dao<Name> {
     }
 
     @Override
-    public void update(Name newName) {
+    public void update(Contact newContact) {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         EntityTransaction et = null;
         try {
             et = em.getTransaction();
             et.begin();
-            Name name = em.find(Name.class, newName.getId());
-            name.setFirstName(newName.getFirstName());
-            name.setMiddleName(newName.getMiddleName());
-            name.setLastName(newName.getLastName());
-            em.persist(name);
+            Contact contact = em.find(Contact.class, newContact.getId());
+            contact.setPersonId1(newContact.getPersonId1());
+            contact.setPersonId2(newContact.getPersonId2());
+            contact.setDateContact(newContact.getDateContact());
+            em.persist(contact);
             et.commit();
         }
         catch(Exception ex){
@@ -92,8 +91,8 @@ public class NameDao implements Dao<Name> {
         try {
             et = em.getTransaction();
             et.begin();
-            Name name = em.find(Name.class, id);
-            em.remove(name);
+            Contact contact = em.find(Contact.class, id);
+            em.remove(contact);
             et.commit();
         }
         catch(Exception ex){

@@ -11,8 +11,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,10 +46,22 @@ public class AddPerson extends Stage {
         GridPane root = new GridPane();
         HBox hbRowButtons = new HBox();
         Alert alError = new Alert(Alert.AlertType.ERROR);
+        List<TextField> tfList = new LinkedList<>();
+        Collections.addAll(tfList, tfFName, tfMName, tfLName, tfID, tfPnum, tfEmail);
 
         //Buttons
         Button btSubmit = new Button("Submit");
         Button btCancel = new Button("Cancel");
+        btSubmit.setDisable(true);
+        //endregion
+
+        //region TextField handling
+        tfFName.setOnKeyReleased( e -> checkTextFields(btSubmit, tfList));
+        tfMName.setOnKeyReleased( e -> checkTextFields(btSubmit, tfList));
+        tfLName.setOnKeyReleased( e -> checkTextFields(btSubmit, tfList));
+        tfID.setOnKeyReleased( e -> checkTextFields(btSubmit, tfList));
+        tfPnum.setOnKeyReleased( e -> checkTextFields(btSubmit, tfList));
+        tfEmail.setOnKeyReleased( e -> checkTextFields(btSubmit, tfList));
         //endregion
 
         //region Buttons
@@ -55,6 +70,8 @@ public class AddPerson extends Stage {
         hbRowButtons.setAlignment(Pos.CENTER);
 
         btSubmit.setOnAction(e -> {
+            List<Object> personInfo = new LinkedList<>();
+
             try {
                 String fName = tfFName.getText();
                 String mName = tfMName.getText();
@@ -62,20 +79,27 @@ public class AddPerson extends Stage {
                 int id = Integer.parseInt(tfID.getText());
                 String pNum = tfPnum.getText();
                 String email = tfEmail.getText();
-                List<Object> personInfo = new LinkedList<>(){{
-                    add(fName); add(mName); add(lName); add(id); add(pNum); add(email);
-                }};
-                ctrl.addPerson(personInfo);
+                Collections.addAll(personInfo, fName, mName, lName, id, pNum, email);
             } catch (Exception ex) {
                 //Catching if a incorrect info was inputted, and displaying an Alert
                 alError.setHeaderText("Incorrect type in text field!");
+                alError.setContentText("(Make sure that ID is a positive integer)");
                 alError.show();
             }
-            close();
+            if ((int) personInfo.get(3) < 0) {
+                alError.setHeaderText("ID must be a positive integer.");
+                alError.setContentText("");
+                alError.show();
+            }
+            else if (ctrl.addPerson(personInfo)) clearAndClose(tfList);
+            else {
+                alError.setHeaderText("ID already in database");
+                alError.setContentText("(Double check ID or update existing Person)");
+                alError.show();
+            }
         });
-        btCancel.setOnAction(e -> {
-            close();
-        });
+
+        btCancel.setOnAction(e -> clearAndClose(tfList));
         //endregion
 
         //region GridPane settings
@@ -112,7 +136,34 @@ public class AddPerson extends Stage {
         root.add(hbRowButtons, 0, 7,3, 1);
         //endregion
 
+        initModality(Modality.APPLICATION_MODAL);
+        setTitle("Add a Person to the database");
         setScene(new Scene(root));
+    }
+
+    public void clearAndClose(List<TextField> tfList){
+        tfList.get(0).clear();
+        tfList.get(1).clear();
+        tfList.get(2).clear();
+        tfList.get(3).clear();
+        tfList.get(4).clear();
+        tfList.get(5).clear();
+        close();
+    }
+
+    public void checkTextFields(Button btSubmit, List<TextField> tfList){
+        //Checking if each TextFields have some text and if it's not just space
+        for (TextField t: tfList){
+            //A TextField is empty, setting or keeping the button disabled (stop loop)
+            if (t.getText() == null || t.getText().trim().isEmpty()){
+                btSubmit.setDisable(true);
+                break;
+
+                //All TextFields aren't empty, enabling add button
+            } else {
+                btSubmit.setDisable(false);
+            }
+        }
     }
 
 }

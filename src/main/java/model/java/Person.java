@@ -1,15 +1,16 @@
 package model.java;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "person")
 
-public class Person {
-
+public class Person implements Serializable {
+    //region Attributes
     @Id
-    @Column(name = "ID", unique = true)
-    private int id;
+    @Column(name = "person_id", unique = true)
+    private Integer id;
 
     @Column(name = "phoneNumber", nullable = false)
     private String phone;
@@ -17,9 +18,10 @@ public class Person {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @OneToOne
-    @JoinColumn(name = "ID", nullable = false)
+    @OneToOne(mappedBy = "person", cascade=CascadeType.ALL)
+    @PrimaryKeyJoinColumn
     private Name name;
+    //endregion
 
     public Person(Name name, String phone, String email, int id) {
         this.name = name;
@@ -39,6 +41,12 @@ public class Person {
     public void setName(Name name) {
         this.name = name;
     }
+
+    public String getFName(){return name.getFirstName();};
+
+    public String getMName(){return name.getMiddleName();};
+
+    public String getLName(){return name.getLastName();};
 
     public String getPhone() {
         return phone;
@@ -64,16 +72,15 @@ public class Person {
         this.id = id;
     }
 
+    public String print() {
+        return  "Id#" + id + ", " +
+                name +
+                ", ph: " + phone +
+                ", @: " + email;
+    }
+
     @Override
-    public String toString() {
-        return "Person{" +
-                "id=" + id +
-                ", firstName='" + name.getFirstName() + '\'' +
-                ", middleName='" + name.getMiddleName() + '\'' +
-                ", lastName='" + name.getLastName() + '\'' +
-                ", phone='" + phone + '\'' +
-                ", email='" + email + '\'' +
-                ", name=" + name +
-                '}';
+    public String toString(){
+        return id + " " + name.getFirstName() + " " + name.getLastName();
     }
 }

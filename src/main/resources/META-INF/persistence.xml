@@ -10,12 +10,12 @@
         <!-- Define the class for Hibernate which implements JPA -->
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <!-- Define the object that should be persisted in the database -->
-        <class>model.java.Name</class>
         <class>model.java.Person</class>
+        <class>model.java.Name</class>
         <class>model.java.Contact</class>
         <properties>
             <!-- Driver for DB database -->
-            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver" />
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
             <!-- URL for DB -->
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/covidDBR00193006" />
             <!-- Username -->
